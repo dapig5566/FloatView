@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="400dp"
+    android:height="550dp"
+    android:viewportHeight="550"
+    android:viewportWidth="400.0">
+    <group android:name="poker_diamond_a">
+        <path
+            android:name="border"
+            android:strokeWidth="7"
+            android:strokeColor="#96999c"
+            android:fillColor="#D8000000"
+            android:pathData="M5 25a20 20 0 0 1 20 -20
+            h350a20 20 0 0 1 20 20v500a20 20 0 0 1 -20 20h-350a20 20 0 0 1 -20 -20v-500"/>
+    </group>
+</vector>
