@@ -13,9 +13,11 @@
         <entry key="..\:/Users/HP/AndroidStudioProjects/FloatView/app/src/main/res/layout/popwindow.xml" value="0.27239583333333334" />
         <entry key="..\:/Users/HP/AppData/Local/Android/Sdk/platforms/android-32/data/res/layout/simple_list_item_checked.xml" value="0.3140625" />
         <entry key="..\:/Users/HP/AppData/Local/Android/Sdk/platforms/android-32/data/res/layout/simple_list_item_multiple_choice.xml" value="0.3140625" />
+        <entry key="..\:/Users/dapig/Documents/GitHub/FloatView/app/src/main/res/layout/pa_tray.xml" value="0.21875" />
       </map>
     </option>
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

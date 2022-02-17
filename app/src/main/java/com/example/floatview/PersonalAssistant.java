@@ -30,9 +30,19 @@ public class PersonalAssistant {
         paAvatar = new PAAvatar(context);
         paTray = new PATray(context);
 
-        setPaTrayListener();
+//        setPaTrayListener();
         setPaAvatarListener();
 
+    }
+    public boolean onDispatchKeyEvent(KeyEvent keyEvent){
+        if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+            if(paTray.isShown) {
+                hidePaTray();
+                showPaAvatar();
+                return true;
+            }
+        }
+        return false;
     }
 
     private void showPaAvatar(){
@@ -87,43 +97,45 @@ public class PersonalAssistant {
         });
     }
 
-    private void setPaTrayListener(){
-        final ConstraintLayout grayGround = paTray.view.findViewById(R.id.gray_ground);
-        grayGround.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                System.out.println(i);
-                if(i==KeyEvent.KEYCODE_VOLUME_DOWN){
-
-                    hidePaTray();
-                    showPaAvatar();
-                    return true;
-                }
-                return false;
-            }
-        });
-//        grayGround.setOnClickListener(new View.OnClickListener() {
+//    private void setPaTrayListener(){
+//        final ConstraintLayout grayGround = paTray.view.findViewById(R.id.gray_ground);
+//        grayGround.setOnKeyListener(new View.OnKeyListener() {
 //            @Override
-//            public void onClick(View view) {
-//                hidePaTray();
-//                showPaAvatar();
-//            }
-//        });
-
-//        final RelativeLayout popWind = (RelativeLayout) paTray.view.findViewById(R.id.popup_window);
-//        popWind.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
+//            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+//                System.out.println(i);
+//                if(i==KeyEvent.KEYCODE_VOLUME_DOWN){
 //
+//                    hidePaTray();
+//                    showPaAvatar();
+//                    return true;
+//                }
+//                return false;
 //            }
 //        });
-    }
+////        grayGround.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View view) {
+////                hidePaTray();
+////                showPaAvatar();
+////            }
+////        });
+//
+////        final RelativeLayout popWind = (RelativeLayout) paTray.view.findViewById(R.id.popup_window);
+////        popWind.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View view) {
+////
+////            }
+////        });
+//    }
 
     private void showPaTray(){
         windowManager.addView(paTray.view, paTray.params);
+        paTray.isShown = true;
     }
     private void hidePaTray(){
         windowManager.removeView(paTray.view);
+        paTray.isShown = false;
     }
 
     public void show(){

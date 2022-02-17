@@ -4,13 +4,18 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +24,18 @@ import me.zhouzhuo.zzweatherview.WeatherItemView;
 import me.zhouzhuo.zzweatherview.WeatherModel;
 import me.zhouzhuo.zzweatherview.ZzWeatherView;
 
-public class PATray {
+public class PATray extends RelativeLayout{
     public View view;
+    public boolean isShown;
+    private Context context;
     final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
 
     public PATray(Context context){
+        super(context);
+        this.context = context;
+        isShown = false;
         LayoutInflater inflater = LayoutInflater.from(context);
-        view = inflater.inflate(R.layout.pa_tray, null);
+        view = inflater.inflate(R.layout.pa_tray, this);
 
         params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         params.flags = WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
@@ -34,8 +44,23 @@ public class PATray {
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
 
+//        addView(view);
         initializeWeather(context);
         initializeAffairList(context);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent keyEvent){
+        if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+            if(isShown){
+                hide();
+
+            }
+        }
+        return super.dispatchKeyEvent(keyEvent);
+    }
+
+    private void hide(){
 
     }
 
