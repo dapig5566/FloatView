@@ -49,16 +49,7 @@ public class PATray extends RelativeLayout{
         initializeAffairList(context);
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent keyEvent){
-        if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
-            if(isShown){
-                hide();
 
-            }
-        }
-        return super.dispatchKeyEvent(keyEvent);
-    }
 
     private void hide(){
 

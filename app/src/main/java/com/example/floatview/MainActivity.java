@@ -28,8 +28,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        pa = new PersonalAssistant(MainActivity.this);
-        pa.show();
 
+        pa = new PersonalAssistant(MainActivity.this);
+
+
+        Context mContext = MainActivity.this.getApplicationContext();
+        final WindowManager windowManager = (WindowManager) mContext
+                .getSystemService(Context.WINDOW_SERVICE);
+
+        windowManager.addView(pa, pa.params);
     }
 }

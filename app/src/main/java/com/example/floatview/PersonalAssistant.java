@@ -16,41 +16,61 @@ import android.widget.RelativeLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-public class PersonalAssistant {
+public class PersonalAssistant extends RelativeLayout{
 
-    private WindowManager windowManager;
     private PATray paTray;
     private PAAvatar paAvatar;
-
+    private final WindowManager windowManager;
+    public final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
     public PersonalAssistant(Context context){
-        Context mContext = context.getApplicationContext();
-        windowManager = (WindowManager) mContext
+        super(context);
+        windowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        }else{
+            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        }
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+
+        params.format = PixelFormat.TRANSLUCENT;
+        params.gravity = Gravity.CENTER;
+        params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
 
         paAvatar = new PAAvatar(context);
         paTray = new PATray(context);
 
-//        setPaTrayListener();
         setPaAvatarListener();
+        showPaAvatar();
 
     }
-    public boolean onDispatchKeyEvent(KeyEvent keyEvent){
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent keyEvent){
         if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
-            if(paTray.isShown) {
+            System.out.println("BackKey pressed.");
+            if(paTray.isShown){
                 hidePaTray();
                 showPaAvatar();
+                params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                params.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                windowManager.updateViewLayout(PersonalAssistant.this, params);
                 return true;
             }
         }
-        return false;
+        return super.dispatchKeyEvent(keyEvent);
     }
 
     private void showPaAvatar(){
-        windowManager.addView(paAvatar.view, paAvatar.params);
+        addView(paAvatar.view, paAvatar.params);
     }
 
     private void hidePaAvatar(){
-        windowManager.removeView(paAvatar.view);
+        removeView(paAvatar.view);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -76,21 +96,25 @@ public class PersonalAssistant {
                         return true;
                     case MotionEvent.ACTION_UP:
                         if (!paAvatar.moved) {
+                            params.flags = WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+                            params.height = WindowManager.LayoutParams.MATCH_PARENT;
+                            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+                            windowManager.updateViewLayout(PersonalAssistant.this, params);
                             hidePaAvatar();
                             showPaTray();
                         }
                         return true;
-                    case MotionEvent.ACTION_MOVE:
-
-                        paAvatar.params.x = paAvatar.initialX
-                                + (int) (motionEvent.getRawX() - paAvatar.initialTouchX);
-                        paAvatar.params.y = paAvatar.initialY
-                                + (int) (motionEvent.getRawY() - paAvatar.initialTouchY);
-                        double norm = Math.sqrt(Math.pow(motionEvent.getRawX() - paAvatar.initialTouchX, 2) + Math.pow(motionEvent.getRawY() - paAvatar.initialTouchY, 2));
-                        if (norm > 5.0d)
-                            paAvatar.moved = true;
-                        windowManager.updateViewLayout(paAvatar.view, paAvatar.params);
-                        return true;
+//                    case MotionEvent.ACTION_MOVE:
+//
+//                        paAvatar.params.x = paAvatar.initialX
+//                                + (int) (motionEvent.getRawX() - paAvatar.initialTouchX);
+//                        paAvatar.params.y = paAvatar.initialY
+//                                + (int) (motionEvent.getRawY() - paAvatar.initialTouchY);
+//                        double norm = Math.sqrt(Math.pow(motionEvent.getRawX() - paAvatar.initialTouchX, 2) + Math.pow(motionEvent.getRawY() - paAvatar.initialTouchY, 2));
+//                        if (norm > 5.0d)
+//                            paAvatar.moved = true;
+//                        updateViewLayout(paAvatar.view, paAvatar.params);
+//                        return true;
                 }
                 return false;
             }
@@ -130,15 +154,11 @@ public class PersonalAssistant {
 //    }
 
     private void showPaTray(){
-        windowManager.addView(paTray.view, paTray.params);
+        addView(paTray, paTray.params);
         paTray.isShown = true;
     }
     private void hidePaTray(){
-        windowManager.removeView(paTray.view);
+        removeView(paTray);
         paTray.isShown = false;
-    }
-
-    public void show(){
-        showPaAvatar();
     }
 }
