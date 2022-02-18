@@ -3,6 +3,7 @@ package com.example.floatview;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.security.Key;
@@ -27,12 +29,17 @@ import me.zhouzhuo.zzweatherview.ZzWeatherView;
 public class PATray extends RelativeLayout{
     public View view;
     public boolean isShown;
-    private Context context;
+    Context context;
+    PAAvatar pAvatar;
+    final WindowManager windowManager;
     final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public PATray(Context context){
         super(context);
         this.context = context;
+        windowManager = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
         isShown = false;
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.pa_tray, this);
@@ -40,19 +47,39 @@ public class PATray extends RelativeLayout{
         params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         params.flags = WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
         params.format = PixelFormat.TRANSLUCENT;
-        params.gravity = Gravity.CENTER;
+        params.gravity = Gravity.TOP;
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
 
-//        addView(view);
         initializeWeather(context);
         initializeAffairList(context);
     }
 
+    public void setPAvatar(PAAvatar pAvatar) {
+        this.pAvatar = pAvatar;
+    }
 
+    public void show(){
+        isShown = true;
+        windowManager.addView(view, params);
+    }
 
-    private void hide(){
+    public void hide(){
+        isShown = false;
+        windowManager.removeView(view);
+    }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent keyEvent){
+        if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+            System.out.println("BackKey pressed.");
+            if(isShown){
+                hide();
+//                pAvatar.afterClosingTray();
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(keyEvent);
     }
 
     private void initializeAffairList(Context context) {

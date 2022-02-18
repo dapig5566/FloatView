@@ -30,12 +30,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         pa = new PersonalAssistant(MainActivity.this);
-
-
-        Context mContext = MainActivity.this.getApplicationContext();
-        final WindowManager windowManager = (WindowManager) mContext
-                .getSystemService(Context.WINDOW_SERVICE);
-
-        windowManager.addView(pa, pa.params);
+        pa.start();
     }
 }
