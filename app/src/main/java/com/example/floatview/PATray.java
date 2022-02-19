@@ -2,16 +2,23 @@ package com.example.floatview;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -19,6 +26,10 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +44,7 @@ public class PATray extends RelativeLayout{
     public boolean isShown;
     Context context;
     PAAvatar pAvatar;
+    boolean moved = false;
     final WindowManager windowManager;
     final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
 
@@ -42,19 +54,106 @@ public class PATray extends RelativeLayout{
         this.context = context;
         windowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
+//        windowManager = (WindowManager) context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+
         isShown = false;
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.pa_tray, this);
 
         params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
         params.flags = WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+//        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
         params.format = PixelFormat.TRANSLUCENT;
         params.gravity = Gravity.TOP;
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
 
-        initializeWeather(context);
-        initializeAffairList(context);
+
+        View ground = view.findViewById(R.id.gray_ground);
+        ground.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeTray();
+            }
+        });
+
+        View tray = view.findViewById(R.id.tray_layout);
+        tray.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                System.out.println("tray clicked.");
+            }
+        });
+
+        View btn_add = view.findViewById(R.id.btn_addAffair);
+        btn_add.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeTray();
+                Intent intent = new Intent();
+                intent.setClass(context, MainActivity.class);
+                context.startActivity(intent);
+//                setTopApp(context);
+            }
+        });
+
+
+//        initializeWeather(context);
+//        initializeAffairList(context);
+    }
+//    @RequiresApi(api = Build.VERSION_CODES.M)
+//    public static void setTopApp(Context context) {
+//        if (!isRunningForeground(context)) {
+//            System.out.println("aaa");
+//            /* *获取ActivityManager*/
+//            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+//
+//            /* *获得当前运行的task(任务)*/
+//            List<ActivityManager.RunningTaskInfo> taskInfoList = activityManager.getRunningTasks(100);
+//            for (ActivityManager.RunningTaskInfo taskInfo : taskInfoList) {
+//                /* *找到本应用的 task，并将它切换到前台*/
+//                if (taskInfo.topActivity.getPackageName().equals(context.getPackageName())) {
+//                    activityManager.moveTaskToFront(taskInfo.id, 0);
+//                    break;
+//                }
+//            }
+//        }
+//    }
+//
+//    public static boolean isRunningForeground(Context context) {
+//        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+//        List<ActivityManager.RunningAppProcessInfo> appProcessInfoList = activityManager.getRunningAppProcesses();
+//        /*枚举进程*/
+//        for (ActivityManager.RunningAppProcessInfo appProcessInfo : appProcessInfoList) {
+//            if (appProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+//                if (appProcessInfo.processName.equals(context.getApplicationInfo().processName)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+
+
+    private void writeNewAffair(String affair){
+        FileOutputStream out = null;
+        BufferedWriter writer = null;
+        try{
+            out = context.openFileOutput("data", Context.MODE_APPEND);
+            writer = new BufferedWriter(new OutputStreamWriter(out));
+            writer.newLine();
+            writer.write(affair);
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            try{
+                if(writer != null)
+                    writer.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
     }
 
     public void setPAvatar(PAAvatar pAvatar) {
@@ -115,20 +214,25 @@ public class PATray extends RelativeLayout{
         }).start();
     }
 
+    private void closeTray(){
+        hide();
+        pAvatar.afterClosingTray();
+    }
     @Override
     public boolean dispatchKeyEvent(KeyEvent keyEvent){
         if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
 //            System.out.println("BackKey pressed.");
             if(isShown){
-                hide();
-                pAvatar.afterClosingTray();
+                closeTray();
                 return true;
             }
         }
         return super.dispatchKeyEvent(keyEvent);
     }
 
-    private void initializeAffairList(Context context) {
+    private void loadAffairList(Context context) {
+
+
         ListView affairList = view.findViewById(R.id.affair_list);
         List<String> affairData = new ArrayList<>();
         for(int i=0;i<10;i++) {
@@ -139,37 +243,37 @@ public class PATray extends RelativeLayout{
 
     }
 
-    private void initializeWeather(Context context) {
-        ZzWeatherView weatherView = (ZzWeatherView) view.findViewById(R.id.weather_view);
-        weatherView.setData(generateMockData());
-
-        //画折线
-        weatherView.setLineType(ZzWeatherView.LINE_TYPE_CURVE);
-        //画曲线(已修复不圆滑问题)
-        //        weatherView.setLineType(ZzWeatherView.LINE_TYPE_CURVE);
-
-        //设置线宽，单位px
-        weatherView.setLineWidth(6f);
-
-        //设置一屏幕显示几列(最少3列)
-        try {
-            weatherView.setColumnNumber(6);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //设置白天和晚上线条的颜色
-        weatherView.setDayAndNightLineColor(Color.BLUE, Color.RED);
-
-        //点击某一列
-        weatherView.setOnWeatherItemClickListener(new ZzWeatherView.OnWeatherItemClickListener() {
-            @Override
-            public void onItemClick(WeatherItemView itemView, int position, WeatherModel weatherModel) {
-                Toast.makeText(context, position + "", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
+//    private void initializeWeather(Context context) {
+//        ZzWeatherView weatherView = (ZzWeatherView) view.findViewById(R.id.weather_view);
+//        weatherView.setData(generateMockData());
+//
+//        //画折线
+//        weatherView.setLineType(ZzWeatherView.LINE_TYPE_CURVE);
+//        //画曲线(已修复不圆滑问题)
+//        //        weatherView.setLineType(ZzWeatherView.LINE_TYPE_CURVE);
+//
+//        //设置线宽，单位px
+//        weatherView.setLineWidth(6f);
+//
+//        //设置一屏幕显示几列(最少3列)
+//        try {
+//            weatherView.setColumnNumber(6);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        //设置白天和晚上线条的颜色
+//        weatherView.setDayAndNightLineColor(Color.BLUE, Color.RED);
+//
+//        //点击某一列
+//        weatherView.setOnWeatherItemClickListener(new ZzWeatherView.OnWeatherItemClickListener() {
+//            @Override
+//            public void onItemClick(WeatherItemView itemView, int position, WeatherModel weatherModel) {
+//                Toast.makeText(context, position + "", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//    }
 
     private List<WeatherModel> generateMockData() {
         List<WeatherModel> list = new ArrayList<WeatherModel>();

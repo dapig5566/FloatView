@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,14 +23,21 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private PersonalAssistant pa;
+    private PersonalAssistant pa = null;
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if(pa == null) {
+            pa = new PersonalAssistant(MainActivity.this);
+            pa.start();
+        }
+    }
 
-        pa = new PersonalAssistant(MainActivity.this);
-        pa.start();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }

@@ -37,7 +37,9 @@ public class PersonalAssistant {
 
 
     }
+    public void destroy(){
 
+    }
     public void start(){
         paAvatar.show();
     }
