@@ -1,5 +1,7 @@
 package com.example.floatview;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -61,21 +63,65 @@ public class PATray extends RelativeLayout{
 
     public void show(){
         isShown = true;
-        windowManager.addView(view, params);
+
+        View tray = PATray.this.view.findViewById(R.id.tray_layout);
+        tray.setAlpha(0.0f);
+        tray.animate().alpha(1.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                windowManager.addView(view, params);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        }).start();
     }
 
     public void hide(){
         isShown = false;
-        windowManager.removeView(view);
+        View tray = PATray.this.view.findViewById(R.id.tray_layout);
+        tray.animate().alpha(0.0f).setDuration(300).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                windowManager.removeView(view);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        }).start();
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent keyEvent){
         if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_DOWN){
-            System.out.println("BackKey pressed.");
+//            System.out.println("BackKey pressed.");
             if(isShown){
                 hide();
-//                pAvatar.afterClosingTray();
+                pAvatar.afterClosingTray();
                 return true;
             }
         }

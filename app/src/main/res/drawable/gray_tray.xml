@@ -7,7 +7,7 @@
     <group android:name="poker_diamond_a">
         <path
             android:name="border"
-            android:strokeWidth="7"
+            android:strokeWidth="3"
             android:strokeColor="#96999c"
             android:fillColor="#D8000000"
             android:pathData="M5 25a20 20 0 0 1 20 -20

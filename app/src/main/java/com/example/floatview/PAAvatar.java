@@ -63,7 +63,7 @@ public class PAAvatar {
         float avatarWidth = PAAvatar.this.view.getMeasuredWidth();
         initialX = params.x;
         initialY = params.y;
-        System.out.println(String.format("x: %d, y:%d", initialX, initialY));
+//        System.out.println(String.format("x: %d, y:%d", initialX, initialY));
 
 
 //        view.animate().x((viewWidth - avatarWidth)/2).y(viewHeight - avatarHeight).setDuration(300).start();
@@ -72,9 +72,9 @@ public class PAAvatar {
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                params.x = initialX +  (int)(valueAnimator.getAnimatedFraction() * (viewWidth/2 - initialX - avatarWidth/2));
-                params.y = initialY + (int)(valueAnimator.getAnimatedFraction() * (viewHeight - initialY - avatarHeight));
-                System.out.println(String.format("pa.x: %d", params.x));
+                params.x = initialX +  (int)(valueAnimator.getAnimatedFraction() * (0 - initialX));
+                params.y = initialY + (int)(valueAnimator.getAnimatedFraction() * (viewHeight/2 - initialY - avatarHeight/2));
+//                System.out.println(String.format("pa.x: %d", params.x));
                 windowManager.updateViewLayout(PAAvatar.this.view, params);
             }
         });
@@ -86,7 +86,7 @@ public class PAAvatar {
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                pTray.show();
+
             }
 
             @Override
@@ -136,7 +136,43 @@ public class PAAvatar {
 //        }).start();
     }
     private void animAfterClose(){
-        PAAvatar.this.view.animate().x(initialX).y(initialTouchY).setDuration(300).start();
+//        PAAvatar.this.view.animate().x(initialX).y(initialTouchY).setDuration(300).start();
+        final int currentX = params.x;
+        final int currentY = params.y;
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1.0f);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                params.x = currentX +  (int)(valueAnimator.getAnimatedFraction() * (initialX - currentX));
+                params.y = currentY + (int)(valueAnimator.getAnimatedFraction() * (initialY - currentY));
+//                System.out.println(String.format("pa.x: %d", params.x));
+                windowManager.updateViewLayout(PAAvatar.this.view, params);
+            }
+        });
+        valueAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        valueAnimator.setDuration(300);
+        valueAnimator.start();
+
     }
 
     public void afterClosingTray(){
@@ -161,6 +197,7 @@ public class PAAvatar {
                     case MotionEvent.ACTION_UP:
                         if (!moved) {
                             animBeforeExpansion();
+                            pTray.show();
                         }
                         return true;
                     case MotionEvent.ACTION_MOVE:
